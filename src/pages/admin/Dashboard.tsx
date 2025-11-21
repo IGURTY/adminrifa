@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Users, DollarSign, UserPlus, Settings, Percent } from "lucide-react";
+import { Users, DollarSign, UserPlus, Percent } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type Afiliado = {
@@ -110,7 +110,7 @@ export default function Dashboard() {
           icon={<DollarSign className="w-10 h-10 text-gray-400" />}
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <CardGlass
           title="Receita Total"
           value={<span className="text-3xl font-bold text-white">R$ {receita.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>}
@@ -120,11 +120,6 @@ export default function Dashboard() {
           title="Comissão Total"
           value={<span className="text-3xl font-bold text-white">R$ {totalComissao.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>}
           icon={<Percent className="w-10 h-10 text-gray-400" />}
-        />
-        <CardGlass
-          title="Configurações Gerais"
-          value={<span className="text-base text-gray-300">Acesse as configurações do sistema</span>}
-          icon={<Settings className="w-10 h-10 text-gray-400" />}
         />
       </div>
     </div>
