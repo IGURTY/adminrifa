@@ -127,19 +127,6 @@ export default function Dashboard() {
           icon={<Settings className="w-10 h-10 text-gray-400" />}
         />
       </div>
-      <div className="mt-8">
-        <CardGlass
-          title="Configurações Gerais"
-          value={
-            <ul className="text-gray-300 text-base list-disc pl-5 space-y-1">
-              <li>Modo escuro ativado</li>
-              <li>Cards com efeito glass</li>
-              <li>Dados reais do Supabase</li>
-            </ul>
-          }
-          icon={<Settings className="w-10 h-10 text-gray-400" />}
-        />
-      </div>
     </div>
   );
 }
