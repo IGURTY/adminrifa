@@ -168,7 +168,7 @@ export default function Sorteios() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-white">Sorteios</h1>
-        <Button onClick={openCreate} className="gap-2">
+        <Button onClick={openCreate} className="gap-2 bg-black hover:bg-zinc-900 text-white">
           <Plus size={18} /> Novo Sorteio
         </Button>
       </div>
@@ -181,22 +181,22 @@ export default function Sorteios() {
           {sorteios && sorteios.length > 0 ? sorteios.map((s) => (
             <div
               key={s.id}
-              className="bg-white/10 border border-white/20 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
+              className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
               style={{
-                boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.25)",
-                border: "1px solid rgba(255,255,255,0.18)",
+                boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
+                border: "1px solid #23272b",
               }}
             >
               {s.image_path && (
                 <img
                   src={s.image_path}
                   alt={s.name}
-                  className="w-full h-40 object-cover rounded-xl mb-2 border border-white/10"
+                  className="w-full h-40 object-cover rounded-xl mb-2 border border-zinc-900"
                 />
               )}
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-white">{s.name}</h2>
-                <p className="text-gray-200 text-sm mb-2">{s.description}</p>
+                <p className="text-gray-300 text-sm mb-2">{s.description}</p>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-emerald-300 font-bold text-lg">
                     R$ {Number(s.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
@@ -212,10 +212,10 @@ export default function Sorteios() {
                 )}
               </div>
               <div className="flex gap-2 mt-2">
-                <Button variant="secondary" size="sm" onClick={() => openEdit(s)} className="gap-1">
+                <Button variant="secondary" size="sm" onClick={() => openEdit(s)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
                   <Pencil size={16} /> Editar
                 </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(s.id)} className="gap-1" disabled={mutationDelete.isPending}>
+                <Button variant="destructive" size="sm" onClick={() => handleDelete(s.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
                   <Trash2 size={16} /> Deletar
                 </Button>
               </div>
@@ -230,9 +230,9 @@ export default function Sorteios() {
 
       {/* Modal de criar/editar */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg bg-[#181c1f] border border-zinc-800 text-white shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg">
+            <DialogTitle className="text-lg text-white">
               {editId ? "Editar Sorteio" : "Novo Sorteio"}
             </DialogTitle>
           </DialogHeader>
@@ -242,14 +242,14 @@ export default function Sorteios() {
               placeholder="Nome do sorteio"
               value={form.name}
               onChange={handleChange}
-              className="bg-white/10 text-white"
+              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
             />
             <Textarea
               name="description"
               placeholder="Descrição"
               value={form.description}
               onChange={handleChange}
-              className="bg-white/10 text-white"
+              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
             />
             <Input
               name="price"
@@ -257,7 +257,7 @@ export default function Sorteios() {
               placeholder="Preço"
               value={form.price}
               onChange={handleChange}
-              className="bg-white/10 text-white"
+              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
               min={0}
               step={0.01}
             />
@@ -266,7 +266,7 @@ export default function Sorteios() {
               placeholder="URL da imagem"
               value={form.image_path}
               onChange={handleChange}
-              className="bg-white/10 text-white"
+              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
             />
             <Input
               name="date_of_draw"
@@ -274,7 +274,7 @@ export default function Sorteios() {
               placeholder="Data do sorteio"
               value={form.date_of_draw ? form.date_of_draw.slice(0, 16) : ""}
               onChange={handleChange}
-              className="bg-white/10 text-white"
+              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
             />
             <label className="flex items-center gap-2 text-white text-sm mt-2">
               <input
@@ -282,16 +282,16 @@ export default function Sorteios() {
                 name="status"
                 checked={form.status}
                 onChange={handleChange}
-                className="accent-blue-500"
+                className="accent-blue-500 bg-zinc-900 border-zinc-700"
               />
               Ativo
             </label>
           </div>
-          <DialogFooter className="gap-2">
-            <Button variant="secondary" onClick={() => setModalOpen(false)} className="gap-1">
+          <DialogFooter className="gap-2 mt-4">
+            <Button variant="secondary" onClick={() => setModalOpen(false)} className="gap-1 bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700">
               <X size={16} /> Cancelar
             </Button>
-            <Button onClick={handleSave} className="gap-1" disabled={mutationUpsert.isPending}>
+            <Button onClick={handleSave} className="gap-1 bg-blue-900 text-white hover:bg-blue-800 border border-blue-800" disabled={mutationUpsert.isPending}>
               {mutationUpsert.isPending ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />} Salvar
             </Button>
           </DialogFooter>
