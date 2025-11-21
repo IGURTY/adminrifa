@@ -16,23 +16,43 @@ type Afiliado = {
   created_at?: string;
 };
 
-function useAfiliados() {
+const PAGE_SIZE = 10;
+
+function useAfiliados(page: number) {
   return useQuery<Afiliado[]>({
-    queryKey: ["afiliados"],
+    queryKey: ["afiliados", page],
     queryFn: async () => {
+      const from = (page - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
       const { data, error } = await supabase
         .from("afiliados")
         .select("id, customer_id, whatsapp, link, comissao_percent, created_at")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .range(from, to);
       if (error) throw error;
       return data as Afiliado[];
     },
   });
 }
 
+function useAfiliadosCount() {
+  return useQuery<number>({
+    queryKey: ["afiliados-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("afiliados")
+        .select("*", { count: "exact", head: true });
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+}
+
 export default function Afiliados() {
+  const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
-  const { data: afiliados, isLoading } = useAfiliados();
+  const { data: afiliados, isLoading } = useAfiliados(page);
+  const { data: totalCount, isLoading: loadingCount } = useAfiliadosCount();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -74,6 +94,7 @@ export default function Afiliados() {
     onSuccess: () => {
       showSuccess("Afiliado salvo com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["afiliados"] });
+      queryClient.invalidateQueries({ queryKey: ["afiliados-count"] });
       setModalOpen(false);
     },
     onError: () => showError("Erro ao salvar afiliado."),
@@ -91,6 +112,7 @@ export default function Afiliados() {
     onSuccess: () => {
       showSuccess("Afiliado excluído!");
       queryClient.invalidateQueries({ queryKey: ["afiliados"] });
+      queryClient.invalidateQueries({ queryKey: ["afiliados-count"] });
     },
     onError: () => showError("Erro ao excluir afiliado."),
   });
@@ -136,6 +158,8 @@ export default function Afiliados() {
     }
   }
 
+  const totalPages = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 1;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -144,48 +168,74 @@ export default function Afiliados() {
           <Plus size={18} /> Novo Afiliado
         </Button>
       </div>
-      {isLoading ? (
+      {isLoading || loadingCount ? (
         <div className="flex justify-center py-12">
           <Loader2 className="animate-spin text-gray-400" size={32} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {afiliados && afiliados.length > 0 ? afiliados.map((a) => (
-            <div
-              key={a.id}
-              className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
-              style={{
-                boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
-                border: "1px solid #23272b",
-              }}
-            >
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-white break-all">{a.whatsapp}</h2>
-                <p className="text-gray-300 text-sm mb-2 break-all">{a.link}</p>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-blue-300 font-bold text-lg">
-                    Comissão: {a.comissao_percent}%
-                  </span>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {afiliados && afiliados.length > 0 ? afiliados.map((a) => (
+              <div
+                key={a.id}
+                className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
+                style={{
+                  boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
+                  border: "1px solid #23272b",
+                }}
+              >
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-white break-all">{a.whatsapp}</h2>
+                  <p className="text-gray-300 text-sm mb-2 break-all">{a.link}</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-blue-300 font-bold text-lg">
+                      Comissão: {a.comissao_percent}%
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    ID Cliente: <span className="break-all">{a.customer_id}</span>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-400">
-                  ID Cliente: <span className="break-all">{a.customer_id}</span>
+                <div className="flex gap-2 mt-2">
+                  <Button variant="secondary" size="sm" onClick={() => openEdit(a)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
+                    <Pencil size={16} /> Editar
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => handleDelete(a.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
+                    <Trash2 size={16} /> Excluir
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-2 mt-2">
-                <Button variant="secondary" size="sm" onClick={() => openEdit(a)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
-                  <Pencil size={16} /> Editar
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(a.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
-                  <Trash2 size={16} /> Excluir
-                </Button>
+            )) : (
+              <div className="col-span-full text-center text-gray-400 py-12">
+                Nenhum afiliado cadastrado.
               </div>
-            </div>
-          )) : (
-            <div className="col-span-full text-center text-gray-400 py-12">
-              Nenhum afiliado cadastrado.
+            )}
+          </div>
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <Button
+                variant="secondary"
+                className="bg-zinc-800 text-white"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                Anterior
+              </Button>
+              <span className="text-gray-300">
+                Página {page} de {totalPages}
+              </span>
+              <Button
+                variant="secondary"
+                className="bg-zinc-800 text-white"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+              >
+                Próxima
+              </Button>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Modal de criar/editar */}

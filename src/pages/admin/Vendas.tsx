@@ -18,23 +18,43 @@ type Venda = {
   date_created?: string | null;
 };
 
-function useVendas() {
+const PAGE_SIZE = 10;
+
+function useVendas(page: number) {
   return useQuery<Venda[]>({
-    queryKey: ["vendas"],
+    queryKey: ["vendas", page],
     queryFn: async () => {
+      const from = (page - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
       const { data, error } = await supabase
         .from("order_list")
         .select("id, code, product_name, total_amount, status, customer_name, payment_method, date_created")
-        .order("date_created", { ascending: false });
+        .order("date_created", { ascending: false })
+        .range(from, to);
       if (error) throw error;
       return data as Venda[];
     },
   });
 }
 
+function useVendasCount() {
+  return useQuery<number>({
+    queryKey: ["vendas-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("order_list")
+        .select("*", { count: "exact", head: true });
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+}
+
 export default function Vendas() {
+  const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
-  const { data: vendas, isLoading } = useVendas();
+  const { data: vendas, isLoading } = useVendas(page);
+  const { data: totalCount, isLoading: loadingCount } = useVendasCount();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -84,6 +104,7 @@ export default function Vendas() {
     onSuccess: () => {
       showSuccess("Venda salva com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["vendas"] });
+      queryClient.invalidateQueries({ queryKey: ["vendas-count"] });
       setModalOpen(false);
     },
     onError: () => showError("Erro ao salvar venda."),
@@ -101,6 +122,7 @@ export default function Vendas() {
     onSuccess: () => {
       showSuccess("Venda excluída!");
       queryClient.invalidateQueries({ queryKey: ["vendas"] });
+      queryClient.invalidateQueries({ queryKey: ["vendas-count"] });
     },
     onError: () => showError("Erro ao excluir venda."),
   });
@@ -150,6 +172,8 @@ export default function Vendas() {
     }
   }
 
+  const totalPages = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 1;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -158,57 +182,83 @@ export default function Vendas() {
           <Plus size={18} /> Nova Venda
         </Button>
       </div>
-      {isLoading ? (
+      {isLoading || loadingCount ? (
         <div className="flex justify-center py-12">
           <Loader2 className="animate-spin text-gray-400" size={32} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {vendas && vendas.length > 0 ? vendas.map((v) => (
-            <div
-              key={v.id}
-              className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
-              style={{
-                boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
-                border: "1px solid #23272b",
-              }}
-            >
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-white break-all">{v.product_name}</h2>
-                <div className="text-gray-300 text-sm mb-2 break-all">{v.customer_name}</div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-emerald-300 font-bold text-lg">
-                    R$ {Number(v.total_amount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                  </span>
-                  <span className="text-blue-300 font-bold text-base">
-                    {v.status}
-                  </span>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {vendas && vendas.length > 0 ? vendas.map((v) => (
+              <div
+                key={v.id}
+                className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
+                style={{
+                  boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
+                  border: "1px solid #23272b",
+                }}
+              >
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-white break-all">{v.product_name}</h2>
+                  <div className="text-gray-300 text-sm mb-2 break-all">{v.customer_name}</div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-emerald-300 font-bold text-lg">
+                      R$ {Number(v.total_amount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-blue-300 font-bold text-base">
+                      {v.status}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    Código: <span className="break-all">{v.code}</span>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    Pagamento: <span className="break-all">{v.payment_method}</span>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    Data: <span className="break-all">{v.date_created ? new Date(v.date_created).toLocaleString("pt-BR") : ""}</span>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-400">
-                  Código: <span className="break-all">{v.code}</span>
-                </div>
-                <div className="text-xs text-gray-400">
-                  Pagamento: <span className="break-all">{v.payment_method}</span>
-                </div>
-                <div className="text-xs text-gray-400">
-                  Data: <span className="break-all">{v.date_created ? new Date(v.date_created).toLocaleString("pt-BR") : ""}</span>
+                <div className="flex gap-2 mt-2">
+                  <Button variant="secondary" size="sm" onClick={() => openEdit(v)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
+                    <Pencil size={16} /> Editar
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => handleDelete(v.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
+                    <Trash2 size={16} /> Excluir
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-2 mt-2">
-                <Button variant="secondary" size="sm" onClick={() => openEdit(v)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
-                  <Pencil size={16} /> Editar
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(v.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
-                  <Trash2 size={16} /> Excluir
-                </Button>
+            )) : (
+              <div className="col-span-full text-center text-gray-400 py-12">
+                Nenhuma venda cadastrada.
               </div>
-            </div>
-          )) : (
-            <div className="col-span-full text-center text-gray-400 py-12">
-              Nenhuma venda cadastrada.
+            )}
+          </div>
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <Button
+                variant="secondary"
+                className="bg-zinc-800 text-white"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                Anterior
+              </Button>
+              <span className="text-gray-300">
+                Página {page} de {totalPages}
+              </span>
+              <Button
+                variant="secondary"
+                className="bg-zinc-800 text-white"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+              >
+                Próxima
+              </Button>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Modal de criar/editar */}

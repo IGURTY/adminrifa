@@ -17,23 +17,43 @@ type Cliente = {
   date_created?: string;
 };
 
-function useClientes() {
+const PAGE_SIZE = 10;
+
+function useClientes(page: number) {
   return useQuery<Cliente[]>({
-    queryKey: ["clientes"],
+    queryKey: ["clientes", page],
     queryFn: async () => {
+      const from = (page - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
       const { data, error } = await supabase
         .from("customer_list")
         .select("id, firstname, phone, email, cpf, avatar, date_created")
-        .order("date_created", { ascending: false });
+        .order("date_created", { ascending: false })
+        .range(from, to);
       if (error) throw error;
       return data as Cliente[];
     },
   });
 }
 
+function useClientesCount() {
+  return useQuery<number>({
+    queryKey: ["clientes-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("customer_list")
+        .select("*", { count: "exact", head: true });
+      if (error) throw error;
+      return count || 0;
+    },
+  });
+}
+
 export default function Clientes() {
+  const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
-  const { data: clientes, isLoading } = useClientes();
+  const { data: clientes, isLoading } = useClientes(page);
+  const { data: totalCount, isLoading: loadingCount } = useClientesCount();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -76,6 +96,7 @@ export default function Clientes() {
     onSuccess: () => {
       showSuccess("Cliente salvo com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["clientes"] });
+      queryClient.invalidateQueries({ queryKey: ["clientes-count"] });
       setModalOpen(false);
     },
     onError: () => showError("Erro ao salvar cliente."),
@@ -93,6 +114,7 @@ export default function Clientes() {
     onSuccess: () => {
       showSuccess("Cliente excluído!");
       queryClient.invalidateQueries({ queryKey: ["clientes"] });
+      queryClient.invalidateQueries({ queryKey: ["clientes-count"] });
     },
     onError: () => showError("Erro ao excluir cliente."),
   });
@@ -138,6 +160,8 @@ export default function Clientes() {
     }
   }
 
+  const totalPages = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 1;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -146,48 +170,74 @@ export default function Clientes() {
           <Plus size={18} /> Novo Cliente
         </Button>
       </div>
-      {isLoading ? (
+      {isLoading || loadingCount ? (
         <div className="flex justify-center py-12">
           <Loader2 className="animate-spin text-gray-400" size={32} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {clientes && clientes.length > 0 ? clientes.map((c) => (
-            <div
-              key={c.id}
-              className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
-              style={{
-                boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
-                border: "1px solid #23272b",
-              }}
-            >
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-white break-all">{c.firstname || "Sem nome"}</h2>
-                <div className="text-gray-300 text-sm mb-2 break-all">{c.email}</div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-blue-300 font-bold text-lg">
-                    {c.phone}
-                  </span>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {clientes && clientes.length > 0 ? clientes.map((c) => (
+              <div
+                key={c.id}
+                className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
+                style={{
+                  boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
+                  border: "1px solid #23272b",
+                }}
+              >
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-white break-all">{c.firstname || "Sem nome"}</h2>
+                  <div className="text-gray-300 text-sm mb-2 break-all">{c.email}</div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-blue-300 font-bold text-lg">
+                      {c.phone}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    CPF: <span className="break-all">{c.cpf}</span>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-400">
-                  CPF: <span className="break-all">{c.cpf}</span>
+                <div className="flex gap-2 mt-2">
+                  <Button variant="secondary" size="sm" onClick={() => openEdit(c)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
+                    <Pencil size={16} /> Editar
+                  </Button>
+                  <Button variant="destructive" size="sm" onClick={() => handleDelete(c.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
+                    <Trash2 size={16} /> Excluir
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-2 mt-2">
-                <Button variant="secondary" size="sm" onClick={() => openEdit(c)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
-                  <Pencil size={16} /> Editar
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(c.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
-                  <Trash2 size={16} /> Excluir
-                </Button>
+            )) : (
+              <div className="col-span-full text-center text-gray-400 py-12">
+                Nenhum cliente cadastrado.
               </div>
-            </div>
-          )) : (
-            <div className="col-span-full text-center text-gray-400 py-12">
-              Nenhum cliente cadastrado.
+            )}
+          </div>
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <Button
+                variant="secondary"
+                className="bg-zinc-800 text-white"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                Anterior
+              </Button>
+              <span className="text-gray-300">
+                Página {page} de {totalPages}
+              </span>
+              <Button
+                variant="secondary"
+                className="bg-zinc-800 text-white"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+              >
+                Próxima
+              </Button>
             </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Modal de criar/editar */}
