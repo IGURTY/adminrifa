@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Trash2, Plus, Check, X } from "lucide-react";
+import { Pencil, Trash2, Plus, Check, X, Loader2 } from "lucide-react";
+import { showSuccess, showError } from "@/utils/toast";
+import supabase from "@/integrations/supabase/client";
 
 type Sorteio = {
   id: number;
@@ -15,29 +18,25 @@ type Sorteio = {
   date_of_draw?: string;
 };
 
-const MOCK_SORTEIOS: Sorteio[] = [
-  {
-    id: 1,
-    name: "Sorteio Carro 0km",
-    description: "Concorra a um carro 0km!",
-    price: 10.0,
-    image_path: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=400&q=80",
-    status: true,
-    date_of_draw: "2025-12-01T20:00:00Z",
-  },
-  {
-    id: 2,
-    name: "Sorteio Moto",
-    description: "Uma moto novinha esperando por você.",
-    price: 5.0,
-    image_path: "https://images.unsplash.com/photo-1511918984145-48de785d4c4e?auto=format&fit=crop&w=400&q=80",
-    status: false,
-    date_of_draw: "2025-11-10T20:00:00Z",
-  },
-];
+function useSorteios() {
+  return useQuery<Sorteio[]>({
+    queryKey: ["sorteios"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_list")
+        .select("id, name, description, price, image_path, status, date_of_draw")
+        .eq("delete_flag", false)
+        .order("id", { ascending: false });
+      if (error) throw error;
+      return data as Sorteio[];
+    },
+  });
+}
 
 export default function Sorteios() {
-  const [sorteios, setSorteios] = useState<Sorteio[]>(MOCK_SORTEIOS);
+  const queryClient = useQueryClient();
+  const { data: sorteios, isLoading } = useSorteios();
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<Omit<Sorteio, "id">>({
@@ -47,6 +46,77 @@ export default function Sorteios() {
     image_path: "",
     status: true,
     date_of_draw: "",
+  });
+
+  // CREATE/UPDATE
+  const mutationUpsert = useMutation({
+    mutationFn: async (input: Partial<Sorteio> & { id?: number }) => {
+      if (input.id) {
+        // update
+        const { error } = await supabase
+          .from("product_list")
+          .update({
+            name: input.name,
+            description: input.description,
+            price: input.price,
+            image_path: input.image_path,
+            status: input.status,
+            date_of_draw: input.date_of_draw || null,
+            date_updated: new Date().toISOString(),
+          })
+          .eq("id", input.id);
+        if (error) throw error;
+      } else {
+        // insert
+        const { error } = await supabase
+          .from("product_list")
+          .insert({
+            name: input.name,
+            description: input.description,
+            price: input.price,
+            image_path: input.image_path,
+            status: input.status,
+            date_of_draw: input.date_of_draw || null,
+            qty_numbers: "0",
+            min_purchase: "1",
+            max_purchase: "1",
+            slug: input.name?.toLowerCase().replace(/\s+/g, "-") || "",
+            pending_numbers: "",
+            paid_numbers: "",
+            ranking_qty: "",
+            enable_ranking: "false",
+            enable_progress_bar: "false",
+            status_display: "ativo",
+            private_draw: "false",
+            featured_draw: "false",
+            enable_cotapremiada: "false",
+          });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      showSuccess("Sorteio salvo com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["sorteios"] });
+      setModalOpen(false);
+    },
+    onError: () => showError("Erro ao salvar sorteio."),
+  });
+
+  // DELETE
+  const mutationDelete = useMutation({
+    mutationFn: async (id: number) => {
+      // Soft delete (set delete_flag = true)
+      const { error } = await supabase
+        .from("product_list")
+        .update({ delete_flag: true, date_updated: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      showSuccess("Sorteio deletado!");
+      queryClient.invalidateQueries({ queryKey: ["sorteios"] });
+    },
+    onError: () => showError("Erro ao deletar sorteio."),
   });
 
   function openCreate() {
@@ -85,30 +155,12 @@ export default function Sorteios() {
 
   function handleSave() {
     if (!form.name || !form.description) return;
-    if (editId) {
-      setSorteios((prev) =>
-        prev.map((s) =>
-          s.id === editId
-            ? { ...s, ...form, price: Number(form.price) }
-            : s
-        )
-      );
-    } else {
-      setSorteios((prev) => [
-        ...prev,
-        {
-          ...form,
-          id: Math.max(0, ...prev.map((s) => s.id)) + 1,
-          price: Number(form.price),
-        },
-      ]);
-    }
-    setModalOpen(false);
+    mutationUpsert.mutate(editId ? { ...form, id: editId } : form);
   }
 
   function handleDelete(id: number) {
     if (window.confirm("Tem certeza que deseja deletar este sorteio?")) {
-      setSorteios((prev) => prev.filter((s) => s.id !== id));
+      mutationDelete.mutate(id);
     }
   }
 
@@ -120,56 +172,61 @@ export default function Sorteios() {
           <Plus size={18} /> Novo Sorteio
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-        {sorteios.map((s) => (
-          <div
-            key={s.id}
-            className="bg-white/10 border border-white/20 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
-            style={{
-              boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.25)",
-              border: "1px solid rgba(255,255,255,0.18)",
-            }}
-          >
-            {s.image_path && (
-              <img
-                src={s.image_path}
-                alt={s.name}
-                className="w-full h-40 object-cover rounded-xl mb-2 border border-white/10"
-              />
-            )}
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-white">{s.name}</h2>
-              <p className="text-gray-200 text-sm mb-2">{s.description}</p>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-emerald-300 font-bold text-lg">
-                  R$ {Number(s.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </span>
-                <span className={s.status ? "text-green-400" : "text-red-400"}>
-                  {s.status ? "Ativo" : "Inativo"}
-                </span>
-              </div>
-              {s.date_of_draw && (
-                <div className="text-xs text-gray-400">
-                  Sorteio: {new Date(s.date_of_draw).toLocaleString("pt-BR")}
-                </div>
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="animate-spin text-gray-400" size={32} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          {sorteios && sorteios.length > 0 ? sorteios.map((s) => (
+            <div
+              key={s.id}
+              className="bg-white/10 border border-white/20 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
+              style={{
+                boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.25)",
+                border: "1px solid rgba(255,255,255,0.18)",
+              }}
+            >
+              {s.image_path && (
+                <img
+                  src={s.image_path}
+                  alt={s.name}
+                  className="w-full h-40 object-cover rounded-xl mb-2 border border-white/10"
+                />
               )}
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-white">{s.name}</h2>
+                <p className="text-gray-200 text-sm mb-2">{s.description}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-emerald-300 font-bold text-lg">
+                    R$ {Number(s.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                  </span>
+                  <span className={s.status ? "text-green-400" : "text-red-400"}>
+                    {s.status ? "Ativo" : "Inativo"}
+                  </span>
+                </div>
+                {s.date_of_draw && (
+                  <div className="text-xs text-gray-400">
+                    Sorteio: {new Date(s.date_of_draw).toLocaleString("pt-BR")}
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Button variant="secondary" size="sm" onClick={() => openEdit(s)} className="gap-1">
+                  <Pencil size={16} /> Editar
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => handleDelete(s.id)} className="gap-1" disabled={mutationDelete.isPending}>
+                  <Trash2 size={16} /> Deletar
+                </Button>
+              </div>
             </div>
-            <div className="flex gap-2 mt-2">
-              <Button variant="secondary" size="sm" onClick={() => openEdit(s)} className="gap-1">
-                <Pencil size={16} /> Editar
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => handleDelete(s.id)} className="gap-1">
-                <Trash2 size={16} /> Deletar
-              </Button>
+          )) : (
+            <div className="col-span-full text-center text-gray-400 py-12">
+              Nenhum sorteio cadastrado.
             </div>
-          </div>
-        ))}
-        {sorteios.length === 0 && (
-          <div className="col-span-full text-center text-gray-400 py-12">
-            Nenhum sorteio cadastrado.
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Modal de criar/editar */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
@@ -234,8 +291,8 @@ export default function Sorteios() {
             <Button variant="secondary" onClick={() => setModalOpen(false)} className="gap-1">
               <X size={16} /> Cancelar
             </Button>
-            <Button onClick={handleSave} className="gap-1">
-              <Check size={16} /> Salvar
+            <Button onClick={handleSave} className="gap-1" disabled={mutationUpsert.isPending}>
+              {mutationUpsert.isPending ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />} Salvar
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -243,3 +300,5 @@ export default function Sorteios() {
     </div>
   );
 }
+
+// Supabase client import
