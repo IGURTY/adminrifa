@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil, Trash2, Plus, Check, X, Loader2 } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
-import supabase from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/client";
 
 type Sorteio = {
   id: number;
@@ -300,5 +300,3 @@ export default function Sorteios() {
     </div>
   );
 }
-
-// Supabase client import
