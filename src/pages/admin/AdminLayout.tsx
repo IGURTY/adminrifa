@@ -28,7 +28,7 @@ export default function AdminLayout() {
       {/* Sidebar fixa */}
       <aside className="fixed top-0 left-0 h-screen w-20 z-30 flex flex-col items-center py-6 bg-[#181c1f] border-r border-[#23272b] shadow-lg">
         <div className="mb-8">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-800 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-white font-bold text-xl shadow-lg">
             M
           </div>
         </div>
@@ -42,7 +42,7 @@ export default function AdminLayout() {
                 className={cn(
                   "flex items-center justify-center w-12 h-12 rounded-lg transition-colors",
                   active
-                    ? "bg-blue-600 text-white shadow-lg"
+                    ? "bg-gray-700 text-white shadow-lg"
                     : "text-gray-400 hover:bg-[#23272b] hover:text-white"
                 )}
                 title={link.label}
@@ -60,11 +60,8 @@ export default function AdminLayout() {
       </aside>
       {/* Conteúdo principal */}
       <div className="flex-1 ml-20 min-h-screen flex flex-col">
-        {/* Header fixo */}
-        <header className="sticky top-0 z-20 h-16 flex items-center px-8 bg-[#23272b] border-b border-[#23272b] shadow">
-          <h1 className="text-xl font-bold text-white">Mira Milionária Admin</h1>
-        </header>
-        <main className="flex-1 p-8 bg-[#23272b] min-h-[calc(100vh-64px-48px)]">
+        {/* Header removido */}
+        <main className="flex-1 p-8 bg-[#23272b] min-h-[calc(100vh-48px)]">
           <Outlet />
         </main>
         {/* Footer fixo */}
