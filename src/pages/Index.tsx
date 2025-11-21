@@ -1,2 +1,4 @@
-import Dashboard from "./admin/Dashboard";
-export default Dashboard;
+import { Navigate } from "react-router-dom";
+export default function Index() {
+  return <Navigate to="/admin" replace />;
+}
