@@ -5,7 +5,6 @@ import {
   Users,
   ShoppingCart,
   Percent,
-  UserCog,
   UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,7 +16,7 @@ const adminLinks = [
   { to: "/admin/clientes", label: "Clientes", icon: <Users size={22} /> },
   { to: "/admin/vendas", label: "Vendas", icon: <ShoppingCart size={22} /> },
   { to: "/admin/comissoes", label: "Comissões", icon: <Percent size={22} /> },
-  { to: "/admin/usuarios", label: "Usuários", icon: <UserCog size={22} /> },
+  // { to: "/admin/usuarios", label: "Usuários", icon: <UserCog size={22} /> }, // Removido
 ];
 
 export default function AdminLayout() {

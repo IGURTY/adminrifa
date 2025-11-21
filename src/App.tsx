@@ -14,7 +14,7 @@ import Afiliados from "./pages/admin/Afiliados";
 import Clientes from "./pages/admin/Clientes";
 import Vendas from "./pages/admin/Vendas";
 import Comissoes from "./pages/admin/Comissoes";
-import Usuarios from "./pages/admin/Usuarios";
+// import Usuarios from "./pages/admin/Usuarios"; // Removido
 
 const queryClient = new QueryClient();
 
@@ -33,7 +33,7 @@ const App = () => (
             <Route path="clientes" element={<Clientes />} />
             <Route path="vendas" element={<Vendas />} />
             <Route path="comissoes" element={<Comissoes />} />
-            <Route path="usuarios" element={<Usuarios />} />
+            {/* <Route path="usuarios" element={<Usuarios />} /> */}
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
