@@ -38,7 +38,7 @@ export default function Dashboard() {
   const totalComissao = getTotalComissao();
 
   return (
-    <div className={dark ? "dark bg-[#181c1f] min-h-screen" : "bg-gray-100 min-h-screen"}>
+    <div className="min-h-screen">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow">Dashboard Mira Milionária</h1>
         <button
