@@ -3,7 +3,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 // Admin pages
@@ -25,18 +24,18 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          {/* Admin routes */}
-          <Route path="/admin" element={<AdminLayout />}>
+          {/* Todas as rotas principais usam o AdminLayout */}
+          <Route path="/" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
-            <Route path="sorteios" element={<Sorteios />} />
-            <Route path="afiliados" element={<Afiliados />} />
-            <Route path="clientes" element={<Clientes />} />
-            <Route path="vendas" element={<Vendas />} />
-            <Route path="comissoes" element={<Comissoes />} />
-            <Route path="usuarios" element={<Usuarios />} />
+            <Route path="admin" element={<Dashboard />} />
+            <Route path="admin/sorteios" element={<Sorteios />} />
+            <Route path="admin/afiliados" element={<Afiliados />} />
+            <Route path="admin/clientes" element={<Clientes />} />
+            <Route path="admin/vendas" element={<Vendas />} />
+            <Route path="admin/comissoes" element={<Comissoes />} />
+            <Route path="admin/usuarios" element={<Usuarios />} />
           </Route>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          {/* Rota de erro */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
