@@ -33,9 +33,10 @@ export default function AdminLayout() {
         </button>
       </header>
 
-      {/* Sidebar + Main */}
-      <div className="flex pt-16 pb-16 min-h-screen">
-        <aside className="w-56 bg-white/10 border-r border-white/20 flex flex-col py-6 px-4 min-h-[calc(100vh-64px)]">
+      {/* Sidebar fixa + Main */}
+      <div className="flex">
+        {/* Sidebar fixa */}
+        <aside className="fixed top-16 left-0 h-[calc(100vh-64px)] w-56 z-20 bg-white/10 border-r border-white/20 backdrop-blur-md flex flex-col py-6 px-4">
           <nav className="flex-1">
             <ul className="space-y-2">
               {adminLinks.map((link) => (
@@ -43,7 +44,7 @@ export default function AdminLayout() {
                   <Link
                     to={link.to}
                     className={cn(
-                      "block px-3 py-2 rounded transition-colors",
+                      "block px-3 py-2 rounded transition-colors font-medium",
                       location.pathname === link.to
                         ? "bg-primary text-white"
                         : "hover:bg-gray-100/10 text-gray-200"
@@ -56,7 +57,8 @@ export default function AdminLayout() {
             </ul>
           </nav>
         </aside>
-        <main className="flex-1 p-8">
+        {/* Main content (com padding para não sobrepor sidebar) */}
+        <main className="flex-1 p-8 ml-56 pt-16 pb-16 min-h-screen">
           <Outlet />
         </main>
       </div>
