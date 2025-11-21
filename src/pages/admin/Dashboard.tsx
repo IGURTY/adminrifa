@@ -40,7 +40,7 @@ export default function Dashboard() {
   return (
     <div className={dark ? "dark bg-gradient-to-br from-[#181c1f] to-[#23272b] min-h-screen" : "bg-gray-100 min-h-screen"}>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-white drop-shadow">Dashboard Mira Milionária</h1>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow">Dashboard Mira Milionária</h1>
         <button
           className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
           onClick={() => setDark((d) => !d)}
@@ -49,51 +49,51 @@ export default function Dashboard() {
           {dark ? <Sun className="text-yellow-300" /> : <Moon className="text-gray-800" />}
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <CardGlass
           title="Afiliados"
           value={totalAfiliados}
-          icon={<UserPlus className="w-8 h-8 text-blue-300" />}
+          icon={<UserPlus className="w-10 h-10 text-blue-400" />}
         />
         <CardGlass
           title="Clientes"
           value={totalClientes}
-          icon={<Users className="w-8 h-8 text-green-300" />}
+          icon={<Users className="w-10 h-10 text-green-400" />}
         />
         <CardGlass
           title="Vendas"
           value={totalVendas}
-          icon={<DollarSign className="w-8 h-8 text-yellow-300" />}
+          icon={<DollarSign className="w-10 h-10 text-yellow-300" />}
         />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <CardGlass
           title="Receita Total"
-          value={`R$ ${receita.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
-          icon={<DollarSign className="w-8 h-8 text-emerald-300" />}
+          value={<span className="text-3xl font-bold">R$ {receita.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>}
+          icon={<DollarSign className="w-10 h-10 text-emerald-300" />}
         />
         <CardGlass
           title="Comissão Total"
-          value={`R$ ${totalComissao.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
-          icon={<Percent className="w-8 h-8 text-pink-300" />}
+          value={<span className="text-3xl font-bold">R$ {totalComissao.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>}
+          icon={<Percent className="w-10 h-10 text-pink-300" />}
         />
         <CardGlass
           title="Configurações Gerais"
-          value={<span className="text-sm text-gray-200">Acesse as configurações do sistema</span>}
-          icon={<Settings className="w-8 h-8 text-gray-300" />}
+          value={<span className="text-base text-gray-200">Acesse as configurações do sistema</span>}
+          icon={<Settings className="w-10 h-10 text-gray-300" />}
         />
       </div>
       <div className="mt-8">
         <CardGlass
           title="Configurações Gerais"
           value={
-            <div className="text-gray-200 text-sm">
-              <p>• Modo escuro ativado</p>
-              <p>• Cards com efeito glass</p>
-              <p>• Pronto para conectar ao Supabase</p>
-            </div>
+            <ul className="text-gray-200 text-base list-disc pl-5 space-y-1">
+              <li>Modo escuro ativado</li>
+              <li>Cards com efeito glass</li>
+              <li>Pronto para conectar ao Supabase</li>
+            </ul>
           }
-          icon={<Settings className="w-8 h-8 text-gray-300" />}
+          icon={<Settings className="w-10 h-10 text-gray-300" />}
         />
       </div>
     </div>
@@ -110,12 +110,19 @@ function CardGlass({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-lg p-6 flex flex-col gap-2 glass-card transition hover:scale-[1.02] hover:shadow-2xl">
-      <div className="flex items-center gap-3">
-        <div className="bg-white/10 rounded-full p-2">{icon}</div>
-        <div className="text-lg font-semibold text-white drop-shadow">{title}</div>
+    <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-7 flex flex-col gap-3 glass-card transition hover:scale-[1.02] hover:shadow-2xl"
+      style={{
+        boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.25)",
+        border: "1px solid rgba(255,255,255,0.18)",
+      }}
+    >
+      <div className="flex items-center gap-4">
+        <div className="bg-white/10 rounded-full p-3 flex items-center justify-center shadow">
+          {icon}
+        </div>
+        <div className="text-lg md:text-xl font-semibold text-white drop-shadow">{title}</div>
       </div>
-      <div className="text-2xl font-bold text-white drop-shadow">{value}</div>
+      <div className="text-2xl md:text-3xl font-extrabold text-white drop-shadow">{value}</div>
     </div>
   );
 }
