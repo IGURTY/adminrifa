@@ -14,13 +14,16 @@ export function SessionContextProvider({ children }: { children: React.ReactNode
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Busca a sessão inicial
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
     });
 
+    // Monitora mudanças na autenticação
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setLoading(false);
     });
 
     return () => {

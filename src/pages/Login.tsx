@@ -1,16 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { showSuccess, showError } from "@/utils/toast";
 import { Loader2 } from "lucide-react";
+import { useSession } from "@/components/SessionContextProvider";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { session } = useSession();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Redireciona para /admin se já estiver logado
+  useEffect(() => {
+    if (session) {
+      navigate("/admin", { replace: true });
+    }
+  }, [session, navigate]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -30,6 +41,7 @@ export default function Login() {
       showError("Erro ao fazer login: " + error.message);
     } else {
       showSuccess("Login realizado com sucesso!");
+      // O redirecionamento será feito pelo useEffect quando a sessão for atualizada
     }
   }
 
