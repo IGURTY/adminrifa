@@ -64,7 +64,7 @@ export default function AdminLayout() {
             );
           })}
         </nav>
-        <div className="mt-auto mb-2 flex flex-col gap-2">
+        <div className="mt-auto mb-2">
           <button
             onClick={handleLogout}
             className="flex items-center justify-center w-12 h-12 rounded-lg text-gray-400 hover:bg-red-900 hover:text-white transition-colors"
@@ -72,9 +72,6 @@ export default function AdminLayout() {
           >
             <LogOut size={22} />
           </button>
-          <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white text-sm">
-            <span>M</span>
-          </div>
         </div>
       </aside>
       {/* Conteúdo principal */}
