@@ -8,16 +8,6 @@ import {
   UserPlus,
   LogOut,
   Settings,
-  Ticket,
-  FileBarChart2,
-  Layers,
-  Zap,
-  Tag,
-  Users2,
-  Building2,
-  Phone,
-  Mail,
-  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,13 +16,6 @@ import { showSuccess, showError } from "@/utils/toast";
 const adminLinks = [
   { to: "/admin", label: "Dashboard", icon: <LayoutDashboard size={22} /> },
   { to: "/admin/sorteios", label: "Sorteios", icon: <Gift size={22} /> },
-  { to: "/admin/cotas", label: "Cotas", icon: <Ticket size={22} /> },
-  { to: "/admin/relatorios", label: "Relatórios", icon: <FileBarChart2 size={22} /> },
-  { to: "/admin/edicoes", label: "Edições", icon: <Layers size={22} /> },
-  { to: "/admin/acoes", label: "Ações", icon: <Zap size={22} /> },
-  { to: "/admin/ofertas", label: "Ofertas", icon: <Tag size={22} /> },
-  { to: "/admin/times", label: "Times", icon: <Users2 size={22} /> },
-  { to: "/admin/distribuidores", label: "Distribuidores", icon: <Building2 size={22} /> },
   { to: "/admin/afiliados", label: "Afiliados", icon: <UserPlus size={22} /> },
   { to: "/admin/clientes", label: "Clientes", icon: <Users size={22} /> },
   { to: "/admin/vendas", label: "Vendas", icon: <ShoppingCart size={22} /> },
@@ -98,16 +81,9 @@ export default function AdminLayout() {
         <main className="flex-1 p-8 bg-[#23272b] min-h-[calc(100vh-48px)]">
           <Outlet />
         </main>
-        {/* Footer fixo com contatos */}
-        <footer className="h-16 flex flex-col items-center justify-center bg-[#181c1f] border-t border-[#23272b] text-gray-400 text-sm gap-1">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1"><Phone size={14} /> (11) 9 3502-7338</span>
-            <span className="flex items-center gap-1"><Mail size={14} /> <a href="mailto:samara@miramilionaria.com.br" className="hover:underline">samara@miramilionaria.com.br</a></span>
-            <span className="flex items-center gap-1"><Globe size={14} /> <a href="https://www.miramilionaria.com.br/" target="_blank" rel="noopener noreferrer" className="hover:underline">miramilionaria.com.br</a></span>
-          </div>
-          <div>
-            &copy; {new Date().getFullYear()} Mira Milionária. Todos os direitos reservados.
-          </div>
+        {/* Footer fixo */}
+        <footer className="h-12 flex items-center justify-center bg-[#181c1f] border-t border-[#23272b] text-gray-400 text-sm">
+          &copy; {new Date().getFullYear()} Mira Milionária. Todos os direitos reservados.
         </footer>
       </div>
     </div>
