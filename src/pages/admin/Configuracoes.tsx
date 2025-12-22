@@ -71,17 +71,30 @@ export default function Configuracoes() {
     showSuccess("Copiado para a área de transferência!");
   }
 
+  const cardStyle = {
+    background: "linear-gradient(135deg, rgba(17,17,17,0.9) 0%, rgba(31,31,31,0.9) 50%, rgba(17,17,17,0.9) 100%)",
+    backdropFilter: "blur(20px)",
+    boxShadow: "0 8px 32px 0 rgba(0,0,0,0.5), 0 0 0 1px rgba(245, 158, 11, 0.1), inset 0 1px 0 0 rgba(255,255,255,0.05)",
+    border: "1px solid rgba(245, 158, 11, 0.15)",
+  };
+
+  const inputClass = "bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300";
+
   return (
     <div className="max-w-4xl">
-      <h1 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-        <Settings className="w-8 h-8" />
-        Configurações do Sistema
-      </h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent flex items-center gap-3">
+          <Settings className="w-8 h-8 text-amber-400" />
+          Configurações do Sistema
+        </h1>
+        <p className="text-gray-400 text-sm mt-1">Gerencie todas as configurações do sistema</p>
+      </div>
 
       {/* Gateway Play */}
-      <div className="bg-[#181c1f] border border-zinc-800 rounded-2xl p-6 mb-6">
+      <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={cardStyle}>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
         <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <span className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-bold">P</span>
+          <span className="w-8 h-8 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-lg flex items-center justify-center text-black text-sm font-bold shadow-lg shadow-amber-500/20">P</span>
           Gateway de Pagamento - Play
         </h2>
         <p className="text-gray-400 text-sm mb-4">
@@ -90,7 +103,7 @@ export default function Configuracoes() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Client ID</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Client ID</label>
             <div className="relative">
               <Input
                 name="play_client_id"
@@ -98,13 +111,13 @@ export default function Configuracoes() {
                 value={form.play_client_id}
                 onChange={handleChange}
                 type={showSecrets.play_client_id ? "text" : "password"}
-                className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500 pr-20"
+                className={`${inputClass} pr-20`}
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                <button onClick={() => toggleShowSecret("play_client_id")} className="text-gray-400 hover:text-white p-1">
+                <button onClick={() => toggleShowSecret("play_client_id")} className="text-gray-500 hover:text-amber-400 p-1 transition-colors">
                   {showSecrets.play_client_id ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-                <button onClick={() => copyToClipboard(form.play_client_id)} className="text-gray-400 hover:text-white p-1">
+                <button onClick={() => copyToClipboard(form.play_client_id)} className="text-gray-500 hover:text-amber-400 p-1 transition-colors">
                   <Copy size={16} />
                 </button>
               </div>
@@ -112,7 +125,7 @@ export default function Configuracoes() {
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Client Secret</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Client Secret</label>
             <div className="relative">
               <Input
                 name="play_client_secret"
@@ -120,13 +133,13 @@ export default function Configuracoes() {
                 value={form.play_client_secret}
                 onChange={handleChange}
                 type={showSecrets.play_client_secret ? "text" : "password"}
-                className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500 pr-20"
+                className={`${inputClass} pr-20`}
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                <button onClick={() => toggleShowSecret("play_client_secret")} className="text-gray-400 hover:text-white p-1">
+                <button onClick={() => toggleShowSecret("play_client_secret")} className="text-gray-500 hover:text-amber-400 p-1 transition-colors">
                   {showSecrets.play_client_secret ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-                <button onClick={() => copyToClipboard(form.play_client_secret)} className="text-gray-400 hover:text-white p-1">
+                <button onClick={() => copyToClipboard(form.play_client_secret)} className="text-gray-500 hover:text-amber-400 p-1 transition-colors">
                   <Copy size={16} />
                 </button>
               </div>
@@ -134,23 +147,23 @@ export default function Configuracoes() {
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">URL do Webhook</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">URL do Webhook</label>
             <Input
               name="play_webhook_url"
               placeholder="https://seusite.com/api/webhook/play"
               value={form.play_webhook_url}
               onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Ambiente</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Ambiente</label>
             <select
               name="play_ambiente"
               value={form.play_ambiente}
               onChange={handleChange}
-              className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-md px-3 py-2"
+              className="w-full bg-gray-900/50 border border-gray-700/50 text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all duration-300"
             >
               <option value="sandbox">Sandbox (Testes)</option>
               <option value="producao">Produção</option>
@@ -160,20 +173,21 @@ export default function Configuracoes() {
       </div>
 
       {/* Configurações PIX */}
-      <div className="bg-[#181c1f] border border-zinc-800 rounded-2xl p-6 mb-6">
+      <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={cardStyle}>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
         <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <span className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white text-sm">💰</span>
+          <span className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center text-white text-sm shadow-lg shadow-emerald-500/20">💰</span>
           Configurações PIX
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Tipo de Chave PIX</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Tipo de Chave PIX</label>
             <select
               name="pix_tipo_chave"
               value={form.pix_tipo_chave}
               onChange={handleChange}
-              className="w-full bg-zinc-900 border border-zinc-700 text-white rounded-md px-3 py-2"
+              className="w-full bg-gray-900/50 border border-gray-700/50 text-white rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all duration-300"
             >
               <option value="cpf">CPF</option>
               <option value="cnpj">CNPJ</option>
@@ -184,61 +198,62 @@ export default function Configuracoes() {
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Chave PIX</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Chave PIX</label>
             <Input
               name="pix_chave"
               placeholder="Sua chave PIX"
               value={form.pix_chave}
               onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500"
+              className={inputClass}
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-white text-sm font-medium mb-2">Nome do Beneficiário</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Nome do Beneficiário</label>
             <Input
               name="pix_beneficiario"
               placeholder="Nome que aparecerá no PIX"
               value={form.pix_beneficiario}
               onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500"
+              className={inputClass}
             />
           </div>
         </div>
       </div>
 
       {/* WhatsApp */}
-      <div className="bg-[#181c1f] border border-zinc-800 rounded-2xl p-6 mb-6">
+      <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={cardStyle}>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-400/30 to-transparent" />
         <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <span className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white text-sm">📱</span>
+          <span className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm shadow-lg shadow-green-500/20">📱</span>
           Integração WhatsApp
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Número do WhatsApp</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Número do WhatsApp</label>
             <Input
               name="whatsapp_numero"
               placeholder="5511999999999"
               value={form.whatsapp_numero}
               onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">ID da Instância</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">ID da Instância</label>
             <Input
               name="whatsapp_instancia"
               placeholder="ID da instância"
               value={form.whatsapp_instancia}
               onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500"
+              className={inputClass}
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-white text-sm font-medium mb-2">Token da API</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Token da API</label>
             <div className="relative">
               <Input
                 name="whatsapp_token"
@@ -246,13 +261,13 @@ export default function Configuracoes() {
                 value={form.whatsapp_token}
                 onChange={handleChange}
                 type={showSecrets.whatsapp_token ? "text" : "password"}
-                className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500 pr-20"
+                className={`${inputClass} pr-20`}
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                <button onClick={() => toggleShowSecret("whatsapp_token")} className="text-gray-400 hover:text-white p-1">
+                <button onClick={() => toggleShowSecret("whatsapp_token")} className="text-gray-500 hover:text-amber-400 p-1 transition-colors">
                   {showSecrets.whatsapp_token ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-                <button onClick={() => copyToClipboard(form.whatsapp_token)} className="text-gray-400 hover:text-white p-1">
+                <button onClick={() => copyToClipboard(form.whatsapp_token)} className="text-gray-500 hover:text-amber-400 p-1 transition-colors">
                   <Copy size={16} />
                 </button>
               </div>
@@ -262,43 +277,44 @@ export default function Configuracoes() {
       </div>
 
       {/* Configurações Gerais */}
-      <div className="bg-[#181c1f] border border-zinc-800 rounded-2xl p-6 mb-6">
+      <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={cardStyle}>
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-400/30 to-transparent" />
         <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <span className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center text-white text-sm">⚙️</span>
+          <span className="w-8 h-8 bg-gradient-to-br from-gray-500 to-gray-700 rounded-lg flex items-center justify-center text-white text-sm shadow-lg shadow-gray-500/20">⚙️</span>
           Configurações Gerais
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-white text-sm font-medium mb-2">Nome do Sistema</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Nome do Sistema</label>
             <Input
               name="nome_sistema"
               placeholder="Mira Milionária"
               value={form.nome_sistema}
               onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-white text-sm font-medium mb-2">URL do Sistema</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">URL do Sistema</label>
             <Input
               name="url_sistema"
               placeholder="https://miramilionaria.com.br"
               value={form.url_sistema}
               onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500"
+              className={inputClass}
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-white text-sm font-medium mb-2">Email de Suporte</label>
+            <label className="block text-gray-300 text-sm font-medium mb-2">Email de Suporte</label>
             <Input
               name="email_suporte"
               placeholder="suporte@miramilionaria.com.br"
               value={form.email_suporte}
               onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500"
+              className={inputClass}
             />
           </div>
         </div>
@@ -309,7 +325,7 @@ export default function Configuracoes() {
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
+          className="bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black px-8 py-3 rounded-lg font-semibold shadow-lg shadow-amber-500/20 border-0 transition-all duration-300 hover:shadow-amber-500/40"
         >
           {saving ? (
             <span className="flex items-center gap-2">

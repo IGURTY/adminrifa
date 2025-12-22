@@ -162,51 +162,74 @@ export default function Afiliados() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Afiliados</h1>
-        <Button onClick={openCreate} className="gap-2 bg-black hover:bg-zinc-900 text-white">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
+            Afiliados
+          </h1>
+          <p className="text-gray-400 text-sm mt-1">Gerencie sua rede de afiliados</p>
+        </div>
+        <Button 
+          onClick={openCreate} 
+          className="gap-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-semibold shadow-lg shadow-amber-500/20 border-0 transition-all duration-300 hover:shadow-amber-500/40"
+        >
           <Plus size={18} /> Novo Afiliado
         </Button>
       </div>
       {isLoading || loadingCount ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="animate-spin text-gray-400" size={32} />
+          <Loader2 className="animate-spin text-amber-400" size={32} />
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {afiliados && afiliados.length > 0 ? afiliados.map((a) => (
               <div
                 key={a.id}
-                className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
+                className="rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden group transition-all duration-300 hover:scale-[1.02]"
                 style={{
-                  boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
-                  border: "1px solid #23272b",
+                  background: "linear-gradient(135deg, rgba(17,17,17,0.9) 0%, rgba(31,31,31,0.9) 50%, rgba(17,17,17,0.9) 100%)",
+                  backdropFilter: "blur(20px)",
+                  boxShadow: "0 8px 32px 0 rgba(0,0,0,0.5), 0 0 0 1px rgba(245, 158, 11, 0.1), inset 0 1px 0 0 rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(245, 158, 11, 0.15)",
                 }}
               >
-                <div className="flex-1">
-                  <h2 className="text-xl font-bold text-white break-all">{a.whatsapp}</h2>
-                  <p className="text-gray-300 text-sm mb-2 break-all">{a.link}</p>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-blue-300 font-bold text-lg">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="flex-1 relative z-10">
+                  <h2 className="text-xl font-bold text-white break-all mb-1">{a.whatsapp}</h2>
+                  <p className="text-gray-400 text-sm mb-3 break-all">{a.link}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-amber-400 font-bold text-lg">
                       Comissão: {a.comissao_percent}%
                     </span>
                   </div>
-                  <div className="text-xs text-gray-400">
-                    ID Cliente: <span className="break-all">{a.customer_id}</span>
+                  <div className="text-xs text-gray-500">
+                    ID Cliente: <span className="break-all text-gray-400">{a.customer_id}</span>
                   </div>
                 </div>
-                <div className="flex gap-2 mt-2">
-                  <Button variant="secondary" size="sm" onClick={() => openEdit(a)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
+                <div className="flex gap-2 mt-2 relative z-10">
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => openEdit(a)} 
+                    className="gap-1 bg-gray-800/80 text-gray-300 hover:text-white hover:bg-gray-700/80 border border-gray-700/50 rounded-lg transition-all duration-300"
+                  >
                     <Pencil size={16} /> Editar
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDelete(a.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    onClick={() => handleDelete(a.id)} 
+                    className="gap-1 bg-red-900/50 text-red-300 hover:bg-red-800/70 border border-red-800/50 rounded-lg transition-all duration-300" 
+                    disabled={mutationDelete.isPending}
+                  >
                     <Trash2 size={16} /> Excluir
                   </Button>
                 </div>
               </div>
             )) : (
-              <div className="col-span-full text-center text-gray-400 py-12">
+              <div className="col-span-full text-center text-gray-500 py-12">
                 Nenhum afiliado cadastrado.
               </div>
             )}
@@ -216,18 +239,18 @@ export default function Afiliados() {
             <div className="flex justify-center items-center gap-4 mt-8">
               <Button
                 variant="secondary"
-                className="bg-zinc-800 text-white"
+                className="bg-gray-800/80 text-gray-300 hover:text-white hover:bg-gray-700/80 border border-gray-700/50 rounded-lg transition-all duration-300 disabled:opacity-50"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
                 Anterior
               </Button>
-              <span className="text-gray-300">
+              <span className="text-amber-400/80 font-medium">
                 Página {page} de {totalPages}
               </span>
               <Button
                 variant="secondary"
-                className="bg-zinc-800 text-white"
+                className="bg-gray-800/80 text-gray-300 hover:text-white hover:bg-gray-700/80 border border-gray-700/50 rounded-lg transition-all duration-300 disabled:opacity-50"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
@@ -240,50 +263,79 @@ export default function Afiliados() {
 
       {/* Modal de criar/editar */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg bg-[#181c1f] border border-zinc-800 text-white shadow-2xl">
+        <DialogContent 
+          className="max-w-lg text-white max-h-[90vh] overflow-y-auto border-0"
+          style={{
+            background: "linear-gradient(135deg, rgba(17,17,17,0.95) 0%, rgba(31,31,31,0.95) 50%, rgba(17,17,17,0.95) 100%)",
+            backdropFilter: "blur(20px)",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(245, 158, 11, 0.1), inset 0 1px 0 0 rgba(255,255,255,0.05)",
+            border: "1px solid rgba(245, 158, 11, 0.2)",
+          }}
+        >
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
           <DialogHeader>
-            <DialogTitle className="text-lg text-white">
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
               {editId ? "Editar Afiliado" : "Novo Afiliado"}
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-3">
-            <Input
-              name="customer_id"
-              placeholder="ID do Cliente"
-              value={form.customer_id}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-            />
-            <Input
-              name="whatsapp"
-              placeholder="WhatsApp"
-              value={form.whatsapp}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-            />
-            <Input
-              name="link"
-              placeholder="Link"
-              value={form.link}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-            />
-            <Input
-              name="comissao_percent"
-              type="number"
-              placeholder="Comissão (%)"
-              value={form.comissao_percent}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-              min={0}
-              step={0.01}
-            />
+          <div className="flex flex-col gap-4">
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">ID do Cliente</label>
+              <Input
+                name="customer_id"
+                placeholder="ID do Cliente"
+                value={form.customer_id}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">WhatsApp</label>
+              <Input
+                name="whatsapp"
+                placeholder="WhatsApp"
+                value={form.whatsapp}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">Link</label>
+              <Input
+                name="link"
+                placeholder="Link"
+                value={form.link}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">Comissão (%)</label>
+              <Input
+                name="comissao_percent"
+                type="number"
+                placeholder="Comissão (%)"
+                value={form.comissao_percent}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+                min={0}
+                step={0.01}
+              />
+            </div>
           </div>
-          <DialogFooter className="gap-2 mt-4">
-            <Button variant="secondary" onClick={() => setModalOpen(false)} className="gap-1 bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700">
+          <DialogFooter className="gap-3 mt-6">
+            <Button 
+              variant="secondary" 
+              onClick={() => setModalOpen(false)} 
+              className="gap-2 bg-gray-800/80 text-gray-300 hover:text-white hover:bg-gray-700/80 border border-gray-700/50 rounded-lg transition-all duration-300"
+            >
               <X size={16} /> Cancelar
             </Button>
-            <Button onClick={handleSave} className="gap-1 bg-blue-900 text-white hover:bg-blue-800 border border-blue-800" disabled={mutationUpsert.isPending}>
+            <Button 
+              onClick={handleSave} 
+              className="gap-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-semibold shadow-lg shadow-amber-500/20 border-0 rounded-lg transition-all duration-300 hover:shadow-amber-500/40" 
+              disabled={mutationUpsert.isPending}
+            >
               {mutationUpsert.isPending ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />} Salvar
             </Button>
           </DialogFooter>

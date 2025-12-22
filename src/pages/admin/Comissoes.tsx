@@ -47,7 +47,7 @@ export default function Comissoes() {
   if (loadingAfiliados || loadingVendas) {
     return (
       <div className="flex justify-center py-12">
-        <Loader2 className="animate-spin text-gray-400" size={32} />
+        <Loader2 className="animate-spin text-amber-400" size={32} />
       </div>
     );
   }
@@ -71,52 +71,76 @@ export default function Comissoes() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">Comissões dos Afiliados</h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
+          Comissões dos Afiliados
+        </h1>
+        <p className="text-gray-400 text-sm mt-1">Acompanhe o desempenho da sua rede</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <ResumoCard
           title="Total de Vendas"
           value={`R$ ${totalGeralVendas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
-          icon={<DollarSign className="w-8 h-8 text-emerald-300" />}
+          icon={<DollarSign className="w-8 h-8 text-emerald-400" />}
+          accentColor="emerald"
         />
         <ResumoCard
           title="Total de Comissões"
           value={`R$ ${totalGeralComissao.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`}
-          icon={<Percent className="w-8 h-8 text-pink-300" />}
+          icon={<Percent className="w-8 h-8 text-amber-400" />}
+          accentColor="amber"
         />
         <ResumoCard
           title="Afiliados"
           value={afiliados?.length || 0}
-          icon={<Users className="w-8 h-8 text-blue-400" />}
+          icon={<Users className="w-8 h-8 text-purple-400" />}
+          accentColor="purple"
         />
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-[#181c1f] border border-zinc-800 rounded-xl shadow-xl text-white">
+      <div 
+        className="overflow-x-auto rounded-2xl"
+        style={{
+          background: "linear-gradient(135deg, rgba(17,17,17,0.9) 0%, rgba(31,31,31,0.9) 50%, rgba(17,17,17,0.9) 100%)",
+          backdropFilter: "blur(20px)",
+          boxShadow: "0 8px 32px 0 rgba(0,0,0,0.5), 0 0 0 1px rgba(245, 158, 11, 0.1), inset 0 1px 0 0 rgba(255,255,255,0.05)",
+          border: "1px solid rgba(245, 158, 11, 0.15)",
+        }}
+      >
+        <div className="h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+        <table className="min-w-full text-white">
           <thead>
-            <tr className="bg-[#23272b]">
-              <th className="py-3 px-4 text-left">WhatsApp</th>
-              <th className="py-3 px-4 text-left">Comissão (%)</th>
-              <th className="py-3 px-4 text-left">Qtd. Vendas</th>
-              <th className="py-3 px-4 text-left">Valor Vendido</th>
-              <th className="py-3 px-4 text-left">Total Comissão</th>
+            <tr className="border-b border-gray-800/50">
+              <th className="py-4 px-6 text-left text-gray-400 font-medium text-sm">WhatsApp</th>
+              <th className="py-4 px-6 text-left text-gray-400 font-medium text-sm">Comissão (%)</th>
+              <th className="py-4 px-6 text-left text-gray-400 font-medium text-sm">Qtd. Vendas</th>
+              <th className="py-4 px-6 text-left text-gray-400 font-medium text-sm">Valor Vendido</th>
+              <th className="py-4 px-6 text-left text-gray-400 font-medium text-sm">Total Comissão</th>
             </tr>
           </thead>
           <tbody>
             {resumo.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center text-gray-400 py-8">
+                <td colSpan={5} className="text-center text-gray-500 py-12">
                   Nenhum afiliado encontrado.
                 </td>
               </tr>
             )}
-            {resumo.map((af) => (
-              <tr key={af.id} className="border-t border-zinc-800 hover:bg-[#23272b] transition">
-                <td className="py-2 px-4">{af.whatsapp}</td>
-                <td className="py-2 px-4">{af.comissao_percent}%</td>
-                <td className="py-2 px-4">{af.totalVendas}</td>
-                <td className="py-2 px-4">
+            {resumo.map((af, idx) => (
+              <tr 
+                key={af.id} 
+                className={`border-t border-gray-800/30 hover:bg-white/5 transition-colors ${idx % 2 === 0 ? 'bg-black/20' : ''}`}
+              >
+                <td className="py-4 px-6 font-medium">{af.whatsapp}</td>
+                <td className="py-4 px-6">
+                  <span className="bg-amber-900/30 text-amber-300 px-3 py-1 rounded-full text-sm font-medium">
+                    {af.comissao_percent}%
+                  </span>
+                </td>
+                <td className="py-4 px-6">{af.totalVendas}</td>
+                <td className="py-4 px-6">
                   R$ {af.valorVendas.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </td>
-                <td className="py-2 px-4 text-emerald-300 font-bold">
+                <td className="py-4 px-6 text-amber-400 font-bold">
                   R$ {af.totalComissao.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </td>
               </tr>
@@ -132,16 +156,48 @@ function ResumoCard({
   title,
   value,
   icon,
+  accentColor = "amber",
 }: {
   title: string;
   value: React.ReactNode;
   icon: React.ReactNode;
+  accentColor?: "amber" | "emerald" | "purple";
 }) {
+  const gradients = {
+    amber: "from-amber-500/20 to-amber-500/5",
+    emerald: "from-emerald-500/20 to-emerald-500/5",
+    purple: "from-purple-500/20 to-purple-500/5",
+  };
+
+  const borders = {
+    amber: "rgba(245, 158, 11, 0.2)",
+    emerald: "rgba(16, 185, 129, 0.2)",
+    purple: "rgba(168, 85, 247, 0.2)",
+  };
+
   return (
-    <div className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-6 flex items-center gap-4">
-      <div className="bg-white/10 rounded-full p-3 flex items-center justify-center shadow">{icon}</div>
-      <div>
-        <div className="text-lg font-semibold text-white">{title}</div>
+    <div 
+      className={`rounded-2xl p-6 flex items-center gap-4 relative overflow-hidden group transition-all duration-300 hover:scale-[1.02]`}
+      style={{
+        background: `linear-gradient(135deg, rgba(17,17,17,0.9) 0%, rgba(31,31,31,0.9) 50%, rgba(17,17,17,0.9) 100%)`,
+        backdropFilter: "blur(20px)",
+        boxShadow: "0 8px 32px 0 rgba(0,0,0,0.5), 0 0 0 1px rgba(245, 158, 11, 0.1), inset 0 1px 0 0 rgba(255,255,255,0.05)",
+        border: `1px solid ${borders[accentColor]}`,
+      }}
+    >
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+      <div className={`absolute inset-0 bg-gradient-to-br ${gradients[accentColor]} opacity-30`} />
+      <div 
+        className="relative z-10 rounded-full p-3 flex items-center justify-center"
+        style={{
+          background: "rgba(0,0,0,0.3)",
+          border: `1px solid ${borders[accentColor]}`,
+        }}
+      >
+        {icon}
+      </div>
+      <div className="relative z-10">
+        <div className="text-sm font-medium text-gray-400">{title}</div>
         <div className="text-2xl font-extrabold text-white">{value}</div>
       </div>
     </div>

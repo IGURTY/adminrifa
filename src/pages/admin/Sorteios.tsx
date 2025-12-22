@@ -190,65 +190,102 @@ export default function Sorteios() {
   const totalPages = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 1;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-white">Sorteios</h1>
-        <Button onClick={openCreate} className="gap-2 bg-black hover:bg-zinc-900 text-white">
+    <div className="min-h-screen">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent drop-shadow-lg">Sorteios</h1>
+          <p className="text-gray-500 text-sm mt-1">Gerencie os sorteios do sistema</p>
+        </div>
+        <Button 
+          onClick={openCreate} 
+          className="gap-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-semibold shadow-lg shadow-amber-500/20 border border-amber-400/30 transition-all duration-300 hover:shadow-amber-500/40 hover:scale-105"
+        >
           <Plus size={18} /> Novo Sorteio
         </Button>
       </div>
       {isLoading || loadingCount ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="animate-spin text-gray-400" size={32} />
+          <Loader2 className="animate-spin text-amber-400" size={32} />
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {sorteios && sorteios.length > 0 ? sorteios.map((s) => (
               <div
                 key={s.id}
-                className="bg-[#181c1f] border border-zinc-800 rounded-2xl shadow-xl p-5 flex flex-col gap-3 backdrop-blur-xl relative"
+                className="relative overflow-hidden rounded-2xl p-5 flex flex-col gap-3 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl group"
                 style={{
-                  boxShadow: "0 8px 32px 0 rgba(0,0,0,0.45)",
-                  border: "1px solid #23272b",
+                  background: "linear-gradient(135deg, rgba(17,17,17,0.9) 0%, rgba(31,31,31,0.8) 50%, rgba(17,17,17,0.9) 100%)",
+                  backdropFilter: "blur(20px)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(245,158,11,0.15)",
                 }}
               >
+                {/* Efeito de brilho superior */}
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+                
                 {s.image_path && (
                   <img
                     src={s.image_path}
                     alt={s.name}
-                    className="w-full h-40 object-cover rounded-xl mb-2 border border-zinc-900"
+                    className="w-full h-40 object-cover rounded-xl mb-2 border border-amber-500/20"
                   />
                 )}
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold text-white">{s.name}</h2>
-                  <p className="text-gray-300 text-sm mb-2">{s.description}</p>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-emerald-300 font-bold text-lg">
+                  <h2 className="text-xl font-bold text-white mb-1">{s.name}</h2>
+                  <p className="text-gray-400 text-sm mb-3">{s.description}</p>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-2xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-300 bg-clip-text text-transparent">
                       R$ {Number(s.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </span>
-                    <span className={s.status ? "text-green-400" : "text-red-400"}>
-                      {s.status ? "Ativo" : "Inativo"}
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      s.status 
+                        ? "bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-300 border border-amber-500/30" 
+                        : "bg-red-500/20 text-red-300 border border-red-500/30"
+                    }`}>
+                      {s.status ? "✓ Ativo" : "Inativo"}
                     </span>
                   </div>
                   {s.date_of_draw && (
-                    <div className="text-xs text-gray-400">
-                      Sorteio: {new Date(s.date_of_draw).toLocaleString("pt-BR")}
+                    <div className="text-xs text-gray-500">
+                      Sorteio: <span className="text-gray-300">{new Date(s.date_of_draw).toLocaleString("pt-BR")}</span>
                     </div>
                   )}
                 </div>
-                <div className="flex gap-2 mt-2">
-                  <Button variant="secondary" size="sm" onClick={() => openEdit(s)} className="gap-1 bg-zinc-900 text-white hover:bg-zinc-800">
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => openEdit(s)} 
+                    className="flex-1 gap-1 bg-gradient-to-r from-amber-600/90 to-yellow-500/90 hover:from-amber-500 hover:to-yellow-400 text-black font-semibold border-0 shadow-md shadow-amber-500/20 transition-all duration-300"
+                  >
                     <Pencil size={16} /> Editar
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDelete(s.id)} className="gap-1 bg-red-800 text-white hover:bg-red-900" disabled={mutationDelete.isPending}>
-                    <Trash2 size={16} /> Deletar
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    onClick={() => handleDelete(s.id)} 
+                    className="gap-1 bg-gray-800/80 hover:bg-red-900/80 text-gray-300 hover:text-white border border-gray-700/50 hover:border-red-700/50 transition-all duration-300" 
+                    disabled={mutationDelete.isPending}
+                  >
+                    <Trash2 size={16} />
                   </Button>
                 </div>
+                
+                {/* Efeito decorativo */}
+                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full blur-2xl group-hover:from-amber-500/20 transition-all duration-500" />
               </div>
             )) : (
-              <div className="col-span-full text-center text-gray-400 py-12">
-                Nenhum sorteio cadastrado.
+              <div className="col-span-full text-center py-16">
+                <div className="inline-flex flex-col items-center gap-4 p-8 rounded-2xl" style={{ background: "linear-gradient(135deg, rgba(17,17,17,0.9) 0%, rgba(31,31,31,0.8) 50%, rgba(17,17,17,0.9) 100%)", border: "1px solid rgba(245,158,11,0.15)" }}>
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 flex items-center justify-center">
+                    <Plus size={32} className="text-amber-400" />
+                  </div>
+                  <p className="text-gray-400 text-lg">Nenhum sorteio cadastrado</p>
+                  <Button onClick={openCreate} className="gap-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-semibold shadow-lg shadow-amber-500/20">
+                    <Plus size={18} /> Criar primeiro sorteio
+                  </Button>
+                </div>
               </div>
             )}
           </div>
@@ -257,22 +294,22 @@ export default function Sorteios() {
             <div className="flex justify-center items-center gap-4 mt-8">
               <Button
                 variant="secondary"
-                className="bg-zinc-800 text-white"
+                className="bg-gray-800/80 text-gray-300 hover:text-white border border-gray-700/50 hover:border-amber-500/30 hover:bg-gray-700/80 transition-all duration-300"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
               >
-                Anterior
+                ← Anterior
               </Button>
-              <span className="text-gray-300">
-                Página {page} de {totalPages}
+              <span className="text-gray-400 px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700/30">
+                Página <span className="text-amber-400 font-semibold">{page}</span> de <span className="text-amber-400 font-semibold">{totalPages}</span>
               </span>
               <Button
                 variant="secondary"
-                className="bg-zinc-800 text-white"
+                className="bg-gray-800/80 text-gray-300 hover:text-white border border-gray-700/50 hover:border-amber-500/30 hover:bg-gray-700/80 transition-all duration-300"
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
               >
-                Próxima
+                Próxima →
               </Button>
             </div>
           )}
@@ -281,68 +318,100 @@ export default function Sorteios() {
 
       {/* Modal de criar/editar */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg bg-[#181c1f] border border-zinc-800 text-white shadow-2xl">
+        <DialogContent 
+          className="max-w-lg text-white max-h-[90vh] overflow-y-auto border-0"
+          style={{
+            background: "linear-gradient(135deg, rgba(17,17,17,0.95) 0%, rgba(31,31,31,0.95) 50%, rgba(17,17,17,0.95) 100%)",
+            backdropFilter: "blur(20px)",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(245, 158, 11, 0.1), inset 0 1px 0 0 rgba(255,255,255,0.05)",
+            border: "1px solid rgba(245, 158, 11, 0.2)",
+          }}
+        >
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
           <DialogHeader>
-            <DialogTitle className="text-lg text-white">
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 bg-clip-text text-transparent">
               {editId ? "Editar Sorteio" : "Novo Sorteio"}
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-3">
-            <Input
-              name="name"
-              placeholder="Nome do sorteio"
-              value={form.name}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-            />
-            <Textarea
-              name="description"
-              placeholder="Descrição"
-              value={form.description}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-            />
-            <Input
-              name="price"
-              type="number"
-              placeholder="Preço"
-              value={form.price}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-              min={0}
-              step={0.01}
-            />
-            <Input
-              name="image_path"
-              placeholder="URL da imagem"
-              value={form.image_path}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-            />
-            <Input
-              name="date_of_draw"
-              type="datetime-local"
-              placeholder="Data do sorteio"
-              value={form.date_of_draw ? form.date_of_draw.slice(0, 16) : ""}
-              onChange={handleChange}
-              className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-400 focus:ring-2 focus:ring-blue-700"
-            />
-            <label className="flex items-center gap-2 text-white text-sm mt-2">
+          <div className="flex flex-col gap-4">
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">Nome do Sorteio</label>
+              <Input
+                name="name"
+                placeholder="Nome do sorteio"
+                value={form.name}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">Descrição</label>
+              <Textarea
+                name="description"
+                placeholder="Descrição"
+                value={form.description}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">Preço</label>
+              <Input
+                name="price"
+                type="number"
+                placeholder="Preço"
+                value={form.price}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+                min={0}
+                step={0.01}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">URL da Imagem</label>
+              <Input
+                name="image_path"
+                placeholder="URL da imagem"
+                value={form.image_path}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-gray-400 mb-2 block font-medium">Data do Sorteio</label>
+              <Input
+                name="date_of_draw"
+                type="datetime-local"
+                placeholder="Data do sorteio"
+                value={form.date_of_draw ? form.date_of_draw.slice(0, 16) : ""}
+                onChange={handleChange}
+                className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
+              />
+            </div>
+            <label className="flex items-center gap-3 text-white text-sm mt-2 cursor-pointer">
               <input
                 type="checkbox"
                 name="status"
                 checked={form.status}
                 onChange={handleChange}
-                className="accent-blue-500 bg-zinc-900 border-zinc-700"
+                className="w-5 h-5 rounded accent-amber-500 bg-gray-900 border-gray-700"
               />
-              Ativo
+              <span className="text-gray-300">Sorteio Ativo</span>
             </label>
           </div>
-          <DialogFooter className="gap-2 mt-4">
-            <Button variant="secondary" onClick={() => setModalOpen(false)} className="gap-1 bg-zinc-800 text-white hover:bg-zinc-700 border border-zinc-700">
+          <DialogFooter className="gap-3 mt-6">
+            <Button 
+              variant="secondary" 
+              onClick={() => setModalOpen(false)} 
+              className="gap-2 bg-gray-800/80 text-gray-300 hover:text-white hover:bg-gray-700/80 border border-gray-700/50 rounded-lg transition-all duration-300"
+            >
               <X size={16} /> Cancelar
             </Button>
-            <Button onClick={handleSave} className="gap-1 bg-blue-900 text-white hover:bg-blue-800 border border-blue-800" disabled={mutationUpsert.isPending}>
+            <Button 
+              onClick={handleSave} 
+              className="gap-2 bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-black font-semibold shadow-lg shadow-amber-500/20 border-0 rounded-lg transition-all duration-300 hover:shadow-amber-500/40" 
+              disabled={mutationUpsert.isPending}
+            >
               {mutationUpsert.isPending ? <Loader2 className="animate-spin" size={16} /> : <Check size={16} />} Salvar
             </Button>
           </DialogFooter>
