@@ -8,6 +8,7 @@ import {
   UserPlus,
   LogOut,
   Settings,
+  Layout,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +21,7 @@ const adminLinks = [
   { to: "/admin/clientes", label: "Clientes", icon: <Users size={22} /> },
   { to: "/admin/vendas", label: "Vendas", icon: <ShoppingCart size={22} /> },
   { to: "/admin/comissoes", label: "Comissões", icon: <Percent size={22} /> },
+  { to: "/admin/landing", label: "Landing Page", icon: <Layout size={22} /> },
   { to: "/admin/configuracoes", label: "Configurações", icon: <Settings size={22} /> },
 ];
 

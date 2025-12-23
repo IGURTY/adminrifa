@@ -12,12 +12,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Cliente = {
   id: string;
-  firstname: string | null;
-  phone: string;
+  nome: string | null;
+  telefone: string;
   email: string | null;
   cpf: string | null;
-  avatar?: string | null;
-  date_created?: string;
+  created_at?: string;
 };
 
 type Transacao = {
@@ -48,8 +47,8 @@ function useClientes(page: number) {
       const to = from + PAGE_SIZE - 1;
       const { data, error } = await supabase
         .from("customer_list")
-        .select("id, firstname, phone, email, cpf, avatar, date_created")
-        .order("date_created", { ascending: false })
+        .select("id, nome, telefone, email, cpf, created_at")
+        .order("created_at", { ascending: false })
         .range(from, to);
       if (error) throw error;
       return data as Cliente[];
@@ -235,11 +234,11 @@ function HistoricoClienteModal({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <span className="text-gray-500 text-xs">Nome</span>
-              <p className="text-white font-semibold">{cliente.firstname || "Não informado"}</p>
+              <p className="text-white font-semibold">{cliente.nome || "Não informado"}</p>
             </div>
             <div>
               <span className="text-gray-500 text-xs">Telefone</span>
-              <p className="text-white font-semibold">{cliente.phone}</p>
+              <p className="text-white font-semibold">{cliente.telefone}</p>
             </div>
             <div>
               <span className="text-gray-500 text-xs">Email</span>
@@ -451,9 +450,9 @@ export default function Clientes() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState<Omit<Cliente, "id" | "date_created" | "avatar">>({
-    firstname: "",
-    phone: "",
+  const [form, setForm] = useState<Omit<Cliente, "id" | "created_at">>({
+    nome: "",
+    telefone: "",
     email: "",
     cpf: "",
   });
@@ -469,11 +468,11 @@ export default function Clientes() {
         const { error } = await supabase
           .from("customer_list")
           .update({
-            firstname: input.firstname,
-            phone: input.phone,
+            nome: input.nome,
+            telefone: input.telefone,
             email: input.email,
             cpf: input.cpf,
-            date_updated: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           })
           .eq("id", input.id);
         if (error) throw error;
@@ -481,8 +480,8 @@ export default function Clientes() {
         const { error } = await supabase
           .from("customer_list")
           .insert({
-            firstname: input.firstname,
-            phone: input.phone,
+            nome: input.nome,
+            telefone: input.telefone,
             email: input.email,
             cpf: input.cpf,
           });
@@ -518,8 +517,8 @@ export default function Clientes() {
   function openCreate() {
     setEditId(null);
     setForm({
-      firstname: "",
-      phone: "",
+      nome: "",
+      telefone: "",
       email: "",
       cpf: "",
     });
@@ -529,8 +528,8 @@ export default function Clientes() {
   function openEdit(c: Cliente) {
     setEditId(c.id);
     setForm({
-      firstname: c.firstname || "",
-      phone: c.phone,
+      nome: c.nome || "",
+      telefone: c.telefone,
       email: c.email || "",
       cpf: c.cpf || "",
     });
@@ -605,13 +604,13 @@ export default function Clientes() {
                     onClick={() => openHistorico(c)}
                     className="text-xl font-bold text-white break-all hover:text-amber-400 transition-colors text-left flex items-center gap-2 group"
                   >
-                    {c.firstname || "Sem nome"}
+                    {c.nome || "Sem nome"}
                     <Eye size={16} className="opacity-0 group-hover:opacity-100 transition-opacity text-amber-400" />
                   </button>
                   <div className="text-gray-400 text-sm mb-2 break-all">{c.email}</div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-amber-400 font-bold text-lg">
-                      {c.phone}
+                      {c.telefone}
                     </span>
                   </div>
                   <div className="text-xs text-gray-500">
@@ -700,9 +699,9 @@ export default function Clientes() {
             <div>
               <label className="text-xs text-gray-400 mb-2 block font-medium">Nome</label>
               <Input
-                name="firstname"
+                name="nome"
                 placeholder="Nome"
-                value={form.firstname || ""}
+                value={form.nome || ""}
                 onChange={handleChange}
                 className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
               />
@@ -710,9 +709,9 @@ export default function Clientes() {
             <div>
               <label className="text-xs text-gray-400 mb-2 block font-medium">Telefone</label>
               <Input
-                name="phone"
+                name="telefone"
                 placeholder="Telefone"
-                value={form.phone}
+                value={form.telefone}
                 onChange={handleChange}
                 className="bg-gray-900/50 border border-gray-700/50 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 rounded-lg transition-all duration-300"
               />
