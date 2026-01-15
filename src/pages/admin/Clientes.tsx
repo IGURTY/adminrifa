@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { 
-  Pencil, Trash2, Plus, Check, X, Loader2, Eye, ChevronDown, ChevronRight, 
-  ShoppingCart, Ticket, User, Calendar, DollarSign, Hash, CreditCard 
+  Pencil, Trash2, Plus, Check, X, Loader2, Eye, User, Calendar, DollarSign, Hash, CreditCard, ShoppingCart, ChevronDown, ChevronRight, Ticket 
 } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,7 +27,6 @@ type Transacao = {
   payment_method: string | null;
   date_created: string | null;
   afiliado_id: string | null;
-  numbers_purchased?: string | null;
 };
 
 type Afiliado = {
@@ -77,7 +75,7 @@ function useClienteTransacoes(clienteId: string | null) {
       if (!clienteId) return [];
       const { data, error } = await supabase
         .from("order_list")
-        .select("id, code, product_name, total_amount, status, payment_method, date_created, afiliado_id, numbers_purchased")
+        .select("id, code, product_name, total_amount, status, payment_method, date_created, afiliado_id")
         .eq("customer_id", clienteId)
         .order("date_created", { ascending: false });
       if (error) throw error;
@@ -101,49 +99,6 @@ function useAfiliados() {
   });
 }
 
-// Componente para exibir os números/cotas de uma transação
-function CotasExpansiveis({ transacao }: { transacao: Transacao }) {
-  const [expanded, setExpanded] = useState(false);
-  
-  // Parse dos números - pode vir como string separada por vírgulas ou array
-  const numeros = transacao.numbers_purchased 
-    ? transacao.numbers_purchased.split(",").map(n => n.trim()).filter(Boolean)
-    : [];
-
-  if (numeros.length === 0) {
-    return (
-      <div className="text-gray-500 text-xs italic pl-6 py-2">
-        Nenhuma cota registrada para esta transação
-      </div>
-    );
-  }
-
-  return (
-    <div className="pl-6 py-2">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors"
-      >
-        {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        <Ticket size={14} />
-        {numeros.length} cota(s) adquirida(s)
-      </button>
-      
-      {expanded && (
-        <div className="mt-2 flex flex-wrap gap-2 max-h-40 overflow-y-auto">
-          {numeros.map((numero, idx) => (
-            <span
-              key={idx}
-              className="bg-amber-900/30 text-amber-300 px-3 py-1 rounded-full text-xs font-mono border border-amber-700/50"
-            >
-              {numero}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 // Componente do Modal de Histórico do Cliente (Drill-down)
 function HistoricoClienteModal({
@@ -285,12 +240,7 @@ function HistoricoClienteModal({
             }}
           >
             <Ticket className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">
-              {transacoes?.reduce((acc, t) => {
-                const nums = t.numbers_purchased?.split(",").filter(Boolean) || [];
-                return acc + nums.length;
-              }, 0) || 0}
-            </p>
+            <p className="text-2xl font-bold text-white">-</p>
             <p className="text-gray-400 text-xs">Cotas Compradas</p>
           </div>
         </div>
@@ -403,11 +353,6 @@ function HistoricoClienteModal({
                               }
                             </p>
                           </div>
-                        </div>
-
-                        {/* Cotas/Números */}
-                        <div className="border-t border-gray-800/50">
-                          <CotasExpansiveis transacao={transacao} />
                         </div>
                       </div>
                     )}
@@ -550,7 +495,7 @@ export default function Clientes() {
   }
 
   function handleSave() {
-    if (!form.phone) return;
+    if (!form.telefone) return;
     mutationUpsert.mutate(editId ? { ...form, id: editId } : form);
   }
 
